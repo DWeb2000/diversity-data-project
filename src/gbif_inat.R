@@ -1,29 +1,25 @@
 ###############################################################################
-# BIODIVERSITY DATASET CONSTRUCTION
-# Species: Tyto alba & Athene noctua
-# Country: Italy
-###############################################################################
-###############################################################################
-# SIMPLE DATASET CONSTRUCTION
+# BIODIVERSITY DATASET CONSTRUCTION - 1ST STEP
 # Species: Tyto alba & Athene noctua
 # Country: Italy
 ###############################################################################
 
-# =========================
-# 1 PACKAGES
-# =========================
 
-library(rgbif)
-library(rnaturalearth)
-library(ggplot2)
-library(rinat)
-library(raster)
-library(dplyr)
-library(sf)
+###############################################################################
+# 1) Required packages
+###############################################################################
+
+library(rgbif) # Allows to download and manage biodiversity data from the GBIF database.
+library(rnaturalearth) # Provides maps and natural geographic data of the world.
+library(ggplot2) # Used to create graphs and visualizations of data.
+library(rinat) # Allows to obtain species observations from iNaturalist
+library(raster) # Used to manipulate and analyze raster data (maps).
+library(dplyr) # Facilitates the manipulation, filtering, and organization of dataframes.
+library(sf) # Used to manipulate vector spatial data (points, lines, polygons).
 
 
 ###############################################################################
-# 2) BASE MAP
+# 2) Creation and verification of the base map (Italy).
 ###############################################################################
 
 Italy <- ne_countries(
@@ -31,22 +27,27 @@ Italy <- ne_countries(
   returnclass = "sf",
   country = "Italy"
 )
-x11()
+
+x11() #for MacOs
 ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   theme_classic()
 
 ###############################################################################
-# 3) -------- SPECIES 1: Tyto alba --------
+# 3) SPECIES 1 data collection: Tyto alba 
 ###############################################################################
 
-myspecies <- "Tyto alba"
+#Define the species 1 :
+myspecies1 <- "Tyto alba"
+
+#Make a limitation of individuals to take frome GBIF:
 gbif_limit <- 5000
 
+# Set dates to limit data collection:
 date_start <- as.Date("2016-01-01")
 date_end   <- as.Date("2026-03-01")
 
-# Italy bounding box
+# The Italy bounding box :
 xmin <- 6
 xmax <- 19
 ymin <- 36
@@ -54,8 +55,8 @@ ymax <- 47
 
 
 
-# GBIF
-key_tyto <- name_backbone(name = myspecies)$usageKey
+# Data GBIF collection for Tyto alba : 
+key_tyto <- name_backbone(name = myspecies1)$usageKey
 
 gbif_tyto_raw <- occ_data(
   taxonKey = key_tyto,
@@ -63,23 +64,24 @@ gbif_tyto_raw <- occ_data(
   limit = gbif_limit
 )
 
+# Inspect the structure:
+head(gbif_tyto_raw)
+names(gbif_tyto_raw)
+
+
+#Take of the species data from Italy only :
 gbif_occ_tyto <- gbif_tyto_raw$data
 
+#Filter by individuals that come frome Italy:
 gbif_tyto_italy <- gbif_occ_tyto %>%
   filter(country == "Italy")
 
+
+#Check of the number of individuals: 
 nrow(gbif_tyto_italy)
+# = 167
 
-plot(
-  gbif_tyto_italy$decimalLongitude,
-  gbif_tyto_italy$decimalLatitude,
-  pch = 16,
-  col = "darkgreen",
-  xlab = "Longitude",
-  ylab = "Latitude",
-  main = "GBIF occurrences of Tyto alba in Italy"
-)
-
+#Verify where the data of the species were taken in Italy : 
 ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   geom_point(
@@ -94,19 +96,36 @@ ggplot(data = Italy) +
 
 
 
-# iNaturalist
+# iNaturalist data collection: 
 inat_tyto_raw <- get_inat_obs(
   query = "Tyto alba",
   place_id = "italy"
 )
-# Inspect the structure
+
+# Inspect the structure:
 head(inat_tyto_raw)
 names(inat_tyto_raw)
 
+#Take of the latitude, longitude and observations data:
+inat_tyto <- data.frame(
+  species = "Tyto alba",
+  latitude = inat_tyto_raw$latitude,
+  longitude = inat_tyto_raw$longitude,
+  date_obs = as.Date(inat_tyto_raw$observed_on),
+  source = "inat"
+)
+
+
+#Check of the number of individuals: 
+nrow(inat_tyto)
+# = 100 individuals
+
+
+#Verify where the data for the species where taken in Italy :
 ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   geom_point(
-    data = inat_tyto_raw,
+    data = inat_tyto,
     aes(x = longitude, y = latitude),
     size = 3,
     shape = 21,
@@ -116,51 +135,42 @@ ggplot(data = Italy) +
   theme_classic()
 
 
-inat_tyto <- data.frame(
-  species = "Tyto alba",
-  latitude = inat_tyto_raw$latitude,
-  longitude = inat_tyto_raw$longitude,
-  date_obs = as.Date(inat_tyto_raw$observed_on),
-  source = "inat"
-)
-
-# Check structure
-head(inat_tyto)
-str(inat_tyto)
-nrow(inat_tyto)
 
 ###############################################################################
-# 5) -------- SPECIES 2: Athene noctua --------
+# 4)  SPECIES 2 data collection: Athene noctua 
 ###############################################################################
 
+#Define the species: 
 myspecies2 <- "Athene noctua"
 
-# GBIF
+
+#Data GBIF collection for Athene noctua: 
 key_athene <- name_backbone(name = myspecies2)$usageKey
 
+#Collection of the raw data from GBIF into a variable:
 gbif_athene_raw <- occ_data(
   taxonKey = key_athene,
   hasCoordinate = TRUE,
   limit = gbif_limit
 )
 
+#Inspect the structure:
+head(gbif_athene_raw)
+names(gbif_athene_raw)
+
+#take of the data:
 gbif_occ_athene <- gbif_athene_raw$data
 
+#Filter by individuals that come frome Italy:
 gbif_athene_italy <- gbif_occ_athene %>%
   filter(country == "Italy")
 
+#Check of the number of individuals: 
 nrow(gbif_athene_italy)
+# = 56
 
-plot(
-  gbif_athene_italy$decimalLongitude,
-  gbif_athene_italy$decimalLatitude,
-  pch = 16,
-  col = "darkgreen",
-  xlab = "Longitude",
-  ylab = "Latitude",
-  main = "GBIF occurrences of Athene noctua in Italy"
-)
 
+#Verify where the data of the species were taken in Italy : 
 ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   geom_point(
@@ -176,29 +186,16 @@ ggplot(data = Italy) +
 
 
 
-# iNaturalist
+# iNaturalist data collection: 
 inat_athene_raw <- get_inat_obs(
   query = "Athene noctua",
   place_id = "italy"
 )
-# Inspect the structure
+# Inspect the structure:
 head(inat_athene_raw)
 names(inat_athene_raw)
-nrow(inat_athene_raw)
 
-ggplot(data = Italy) +
-  geom_sf(fill = "grey95", color = "black") +
-  geom_point(
-    data = inat_athene_raw,
-    aes(x = longitude, y = latitude),
-    size = 3,
-    shape = 21,
-    fill = "darkred",
-    color = "black"
-  ) +
-  theme_classic()
-
-
+#Take of the latitude, longitude and observations data:
 inat_athene <- data.frame(
   species = "Athene noctua",
   latitude = inat_athene_raw$latitude,
@@ -207,16 +204,28 @@ inat_athene <- data.frame(
   source = "inat"
 )
 
-head(inat_athene)
-names(inat_athene)
+#Check of the number of individuals: 
 nrow(inat_athene)
+# = 100
 
-
+#Verify where the data for the species where taken in Italy : 
+ggplot(data = Italy) +
+  geom_sf(fill = "grey95", color = "black") +
+  geom_point(
+    data = inat_athene,
+    aes(x = longitude, y = latitude),
+    size = 3,
+    shape = 21,
+    fill = "darkred",
+    color = "black"
+  ) +
+  theme_classic()
 
 ###############################################################################
-# 6) FORMAT GBIF DATA (IMPORTANT FIX)
+# 5) Switch format GBIF data 
 ###############################################################################
 
+#Make sure that Latitude and Longitude data are with the same metric when data are going to merge:
 gbif_tyto <- data.frame(
   species = "Tyto alba",
   latitude = gbif_tyto_italy$decimalLatitude,
@@ -234,9 +243,10 @@ gbif_athene <- data.frame(
 )
 
 ###############################################################################
-# 7) MERGE ALL DATA
+# 6) Merge all data
 ###############################################################################
 
+#Creation of the main matrix:
 matrix_full <- bind_rows(
   gbif_tyto,
   inat_tyto,
@@ -244,16 +254,21 @@ matrix_full <- bind_rows(
   inat_athene
 )
 
-###############################################################################
-# 8) CLEAN DATA
-###############################################################################
-
-#matrix_full <- matrix_full %>%
-  #filter(!is.na(latitude), !is.na(longitude)) %>%
-  #filter(!is.na(date_obs))
 
 ###############################################################################
-# 9) QUICK CHECK
+# 7) Clean data
+###############################################################################
+
+
+#Delete duplicated rows/observations:
+matrix_full <- matrix_full %>%
+  distinct()
+
+#Check the new number of observations:
+nrow(matrix_full)
+
+###############################################################################
+# 8) Quick check
 ###############################################################################
 
 head(matrix_full)
@@ -261,10 +276,10 @@ table(matrix_full$species)
 table(matrix_full$source)
 
 ###############################################################################
-# 10) SIMPLE MAP
+# 9) Creation of general observation map to verify positions of species in Italy.
 ###############################################################################
-x11()
-ggplot() +
+
+p1 <- ggplot() +
   geom_sf(data = Italy, fill = "grey90") +
   geom_point(
     data = matrix_full,
@@ -273,8 +288,4 @@ ggplot() +
   ) +
   theme_classic()
 
-###############################################################################
-# 11) SAVE CLEAN DATASET
-###############################################################################
-
-#write.csv(matrix_full, "owl_occurrences_italy.csv", row.names = FALSE)
+print(p1)
