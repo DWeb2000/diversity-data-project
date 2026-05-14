@@ -38,7 +38,7 @@ elevation_Italy <- get_elev_raster(Italy, z = 8)
 # Quick visualization of the elevation raster
 x11()
 plot(elevation_Italy)
-
+Sys.sleep(3)
 
 ################################################################################
 # 4) Prepare sampling points.
@@ -86,4 +86,38 @@ p3 <- ggplot(matrix_full_eco_elev, aes(x = elevation, fill = Climate_Re)) +
 
 # Display the plot
 print(p3)
+Sys.sleep(3)
+
+
+#Visualization of the elevation distribution differences by species.
+p_species_elev <- ggplot(
+  matrix_full_eco_elev,
+  aes(x = species, y = elevation, fill = species)
+) +
+  
+  # Boxplots
+  geom_boxplot(alpha = 0.7, outlier.shape = NA) +
+  
+  # Individual observations
+  geom_jitter(
+    width = 0.2,
+    alpha = 0.4,
+    size = 1
+  ) +
+  
+  labs(
+    title = "Elevation Distribution by Species",
+    x = "Species",
+    y = "Elevation (m)"
+  ) +
+  
+  theme_minimal() +
+  
+  theme(
+    legend.position = "none"
+  )
+
+# Display the plot
+print(p_species_elev)
+
 

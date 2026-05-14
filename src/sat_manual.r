@@ -40,6 +40,7 @@ st_write(
 
 #Check and vizualise the Italy map :
 plot(st_geometry(Italy_sf), col = "lightgray", main = "Italy")
+Sys.sleep(3)
 
 ################################################################################
 # 3) Following manual steps required in AppEEARS to input satellite data after.  
@@ -84,7 +85,7 @@ print(ndvi_raster)
 
 # Plot the raster:
 plot(ndvi_raster, main = "Downloaded Italy NDVI raster")
-
+Sys.sleep(3)
 
 ################################################################################
 # 5) Clip the raster to the exact Italy border.
@@ -104,7 +105,7 @@ ndvi_italy <- mask(ndvi_italy, Italy_vect)
 # Plot the clipped raster :
 plot(ndvi_italy, main = "NDVI raster clipped to Italy")
 plot(Italy_vect, add = TRUE, border = "black", lwd = 1)
-
+Sys.sleep(3)
 
 ################################################################################
 # 6) Convert the sampling table to spatial points.
@@ -125,7 +126,7 @@ points_vect <- project(points_vect, crs(ndvi_italy))
 # Plot all the localisation points on top of the raster:
 plot(ndvi_italy, main = "Sampling points over NDVI raster")
 plot(points_vect, add = TRUE, col = "red", pch = 16)
-
+Sys.sleep(3)
 
 ################################################################################
 # 7) Extract NDVI values at point locations.
@@ -164,8 +165,34 @@ p5 <- ggplot(matrix_full_eco_elev_climat, aes(x = NDVI, fill = Climate_Re)) +
 
 
 print(p5)
+Sys.sleep(3)
 
+#Control plot NDVI by species.
+p_species <- ggplot(
+  matrix_full_eco_elev_climat,
+  aes(x = species, y = NDVI, fill = species)
+) +
+  
+  # Boxplot
+  geom_boxplot(alpha = 0.7, outlier.shape = NA) +
+  
+  # Points individuels
+  geom_jitter(width = 0.2, alpha = 0.5, size = 1) +
+  
+  labs(
+    title = "NDVI values by owl species",
+    x = "Species",
+    y = "NDVI"
+  ) +
+  
+  theme_minimal() +
+  
+  theme(
+    legend.position = "none"
+  )
+
+print(p_species)
 ################################################################################
 # 10) Export final matrix to csv file. (OPTIONNAL)
 ################################################################################
-#write.csv(matrix_full_eco_elev_climat_sat,"owl_matrix_full.csv",row.names = FALSE)
+write.csv(matrix_full_eco_elev_climat,"owl_matrix_full.csv",row.names = FALSE)

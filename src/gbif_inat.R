@@ -28,10 +28,14 @@ Italy <- ne_countries(
   country = "Italy"
 )
 
+#Checking the map of Italy
 x11() #for MacOs
-ggplot(data = Italy) +
+italy_map<- ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   theme_classic()
+
+print(italy_map)
+Sys.sleep(3)
 
 ###############################################################################
 # 3) SPECIES 1 data collection: Tyto alba 
@@ -44,7 +48,7 @@ myspecies1 <- "Tyto alba"
 gbif_limit <- 5000
 
 # Set dates to limit data collection:
-date_start <- as.Date("2016-01-01")
+date_start <- as.Date("2010-01-01")
 date_end   <- as.Date("2026-03-01")
 
 # The Italy bounding box :
@@ -82,7 +86,7 @@ nrow(gbif_tyto_italy)
 # = 167
 
 #Verify where the data of the species were taken in Italy : 
-ggplot(data = Italy) +
+gbif_plot_tyto <-ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   geom_point(
     data = gbif_tyto_italy,
@@ -93,6 +97,10 @@ ggplot(data = Italy) +
     color = "black"
   ) +
   theme_classic()
+
+print(gbif_plot_tyto)
+Sys.sleep(3)
+
 
 
 
@@ -122,7 +130,7 @@ nrow(inat_tyto)
 
 
 #Verify where the data for the species where taken in Italy :
-ggplot(data = Italy) +
+inat_plot_tyto<-ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   geom_point(
     data = inat_tyto,
@@ -134,7 +142,8 @@ ggplot(data = Italy) +
   ) +
   theme_classic()
 
-
+print(inat_plot_tyto)
+Sys.sleep(3)
 
 ###############################################################################
 # 4)  SPECIES 2 data collection: Athene noctua 
@@ -171,7 +180,7 @@ nrow(gbif_athene_italy)
 
 
 #Verify where the data of the species were taken in Italy : 
-ggplot(data = Italy) +
+gbif_plot_athene <- ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   geom_point(
     data = gbif_athene_italy,
@@ -183,6 +192,8 @@ ggplot(data = Italy) +
   ) +
   theme_classic()
 
+print(gbif_plot_athene)
+Sys.sleep(3)
 
 
 
@@ -209,7 +220,7 @@ nrow(inat_athene)
 # = 100
 
 #Verify where the data for the species where taken in Italy : 
-ggplot(data = Italy) +
+inat_plot_athene <- ggplot(data = Italy) +
   geom_sf(fill = "grey95", color = "black") +
   geom_point(
     data = inat_athene,
@@ -220,6 +231,11 @@ ggplot(data = Italy) +
     color = "black"
   ) +
   theme_classic()
+
+print(inat_plot_athene)
+Sys.sleep(3)
+
+
 
 ###############################################################################
 # 5) Switch format GBIF data 

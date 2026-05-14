@@ -58,6 +58,7 @@ ecosystem_Italy <- mask(r2, Italy)
 
 # Plot the cropped and masked raster, to visualize it in Italy:
 plot(ecosystem_Italy, main = "Ecosystem Raster Restricted to Italy")
+Sys.sleep(3)
 
 ###############################################################################
 # 5) Convert species coordinates into spatial points.
@@ -84,6 +85,7 @@ spatial_points <- SpatialPoints(
 # Add the occurrence points of the 2 species on top of the ecosystem map
 plot(ecosystem_Italy, main = "Species Occurrences on Ecosystem Map")
 plot(spatial_points, add = TRUE, pch = 16, cex = 1.2)
+Sys.sleep(3)
 
 ###############################################################################
 # 6) Extract ecosystem values at each occurence point.
@@ -155,4 +157,3 @@ p2 <- ggplot(matrix_full_eco, aes(x = Climate_Re, fill = species)) +
 
 # Display the plot
 print(p2)
-#write.csv(matrix_full_eco, "owl_matrix.csv", row.names = FALSE)

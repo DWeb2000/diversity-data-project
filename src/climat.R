@@ -31,10 +31,28 @@ species_df <- matrix_full_eco_elev %>%
   mutate(occurrence_id = row_number())
 
 # Plot to visualize :
-ggplot(species_df, aes(x = longitude, y = latitude, color = species)) +
-  geom_point() +
-  theme_classic() +
-  labs(title = "Occurrences of both species")
+x11()
+species_df_p <- ggplot() +
+  geom_sf(
+    data = Italy,
+    fill = "grey95",
+    color = "black"
+  ) +
+  geom_point(
+    data = species_df,
+    aes(
+      x = longitude,
+      y = latitude,
+      color = species
+    ),
+    alpha = 0.7
+  ) +theme_classic() +
+  labs(
+    title = "Occurrences of both species"
+  )
+
+print(species_df_p)
+Sys.sleep(3)
 
 ################################################################################
 # 4) Extract the coordinates.
@@ -73,11 +91,13 @@ species_df <- species_df %>%
   left_join(tmax_df, by = c("longitude", "latitude"))
 
 # Visualize difference of temparature max gradient for each species :
-ggplot(species_df, aes(x = tmax_mean_c, fill = species)) +
+t_max_p <- ggplot(species_df, aes(x = tmax_mean_c, fill = species)) +
   geom_density(alpha = 0.5) +
   theme_classic() +
   labs(title = "Distribution Tmax 2020")
 
+print(t_max_p)
+Sys.sleep(3)
 
 ################################################################################
 # 6) Extract precipitation (2021)
@@ -109,10 +129,13 @@ species_df <- species_df %>%
 
 
 # Visualize difference of precipitation gradient for each species :
-ggplot(species_df, aes(x = prec_annual, fill = species)) +
+prec_p <- ggplot(species_df, aes(x = prec_annual, fill = species)) +
   geom_histogram(bins = 30, alpha = 0.6) +
   theme_classic() +
   labs(title = "Annual precipitation 2021")
+
+print(prec_p)
+Sys.sleep(3)
 
 ################################################################################
 # 7) Creation of temperature forecasts for the month of october for the 2 species.
@@ -147,13 +170,14 @@ species_df <- species_df %>%
   left_join(tas_cur_october_df, by = c("longitude", "latitude"))
   
 
-# Visualize difference of temperature gradient of october for each species :
-p4<- ggplot(species_df, aes(x = tas_current_october_c, fill = species)) +
+# Visualize difference of recent temperature gradient of october for each species :
+current_t_p <- ggplot(species_df, aes(x = tas_current_october_c, fill = species)) +
   geom_density(alpha = 0.5) +
   theme_classic() +
   labs(title = "Temperature gradient in October for owl species")
 
-print(p4)
+print(current_t_p)
+Sys.sleep(3)
 
 ################################################################################
 # 7.2) Future climate conditions in October : temperature in 2050 under SSP126
@@ -180,12 +204,14 @@ species_df <- species_df %>%
   left_join(tas_fut_october_df, by = c("longitude", "latitude"))
 
 
-# Visualize difference of temperature gradient of october for each species :
-ggplot(species_df, aes(x = tas_future_october_2050_c, fill = species)) +
+# Visualize difference of futur temperature gradient of october for each species :
+futur_t_p <- ggplot(species_df, aes(x = tas_future_october_2050_c, fill = species)) +
   geom_density(alpha = 0.5) +
   theme_classic() +
   labs(title = "Temperature gradient in October 2050 for owl species")
 
+print(futur_t_p)
+Sys.sleep(3)
 
 ################################################################################
 # 8) Merge all climat data to the main matrix.
